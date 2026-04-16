@@ -1,5 +1,11 @@
 # Magic-Millipede
 
+Team Members
+-
+- Tech Box Dev & Electronics - Elijah Ludwig
+- Engineer - Tyler Cunningham
+- Engineer - Ethan Stehr
+
 Perf Board Layout
 -
 
