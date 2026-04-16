@@ -32,13 +32,60 @@ void setup() {
   digitalWrite(LED_INTERIOR_RED, HIGH);
 }
 
+// state machine setup
+#define IDLE 0
+#define PHASE_1 1
+#define PHASE_2 2
+#define PHASE_3 3
+
+int currState = IDLE;
+unsigned long phaseStart = 0;
+
 void loop() {
+  switch(currState){
+    case IDLE:
+      if(digitalRead(BTN) == LOW){
+        delay(200);
+        currState = PHASE_1;
+        phaseStart = millis();
 
-  // button logic in testing
-  if (digitalRead(BTN) == LOW) {
-    delay(200);  
-    digitalWrite(LED_EXTERIOR_GREEN, LOW);
-    digitalWrite(LED_EXTERIOR_RED, HIGH);  
+        digitalWrite(LED_EXTERIOR_GREEN, LOW);
+        digitalWrite(LED_EXTERIOR_RED, HIGH);
 
+        // will need to add the trigger for audio track 1 on Adafruit FX sound board here
+    }
+    break;
+    
+    case PHASE_1:
+      if(millis() - phaseStart >= 30000){
+        currState = PHASE_2;
+        phaseStart = millis();
+
+        // will need to set trigger for power relay module to turn UV light strip HIGH(ON)
+      }
+      break;
+
+    case PHASE_2:
+      if(millis() - phaseStart >= 60000){
+        currState = PHASE_3;
+        phaseStart = millis();
+
+        // at 1:30 turn off interior light for the final 30 seconds of narration
+        digitalWrite(LED_INTERIOR_RED, LOW);
+
+        // also another trigger event for power relay module but to turn UV LOW(OFF)
+      
+      }
+      break;
+    
+    case PHASE_3:
+      if(millis() - phaseStart >= 30000){
+        currState = IDLE;
+        
+        digitalWrite(LED_EXTERIOR_RED, LOW);
+        digitalWrite(LED_EXTERIOR_GREEN, HIGH);
+        digitalWrite(LED_INTERIOR_RED, HIGH);
+      }
+      break;
   }
 }
