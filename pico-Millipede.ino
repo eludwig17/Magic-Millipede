@@ -1,9 +1,5 @@
 #include <SPI.h>
 #include <SD.h>
-// header files from testing speaker I2S protocol
-// #include <AudioFileSourceSD.h>
-// #include <AudioGeneratorWAV.h>
-// #include <AudioOutputI2S.h>
 
 // GPIO Pin Layout for Raspi Pico 2 W
 // pinout may need to be changed based on soldering location on perf board
@@ -11,6 +7,16 @@
 #define LED_EXTERIOR_RED 5
 #define LED_EXTERIOR_GREEN 6
 #define BTN 2
+#define UV_RELAY 3
+#define AUDIO_T00 7
+#define AUDIO_ACT 10
+
+
+void triggerAudio(int pin){
+  digitalWrite(pin, LOW);
+  delay(200);
+  digitalWrite(pin, HIGH);
+}
 
 void setup() {
   Serial.begin(9600);
@@ -19,6 +25,11 @@ void setup() {
   pinMode(LED_EXTERIOR_RED, OUTPUT);
   pinMode(LED_EXTERIOR_GREEN, OUTPUT);
   pinMode(BTN, INPUT_PULLUP);
+
+  pinMode(UV_RELAY, OUTPUT);
+  digitalWrite(UV_RELAY, LOW);
+  pinMode(AUDIO_T00, OUTPUT);
+  digitalWrite(AUDIO_T00, HIGH);
 
   // setting all LEDS to LOW(OFF) state until its finished idling/device booted and running state
   digitalWrite(LED_INTERIOR_RED, LOW);
@@ -51,8 +62,9 @@ void loop() {
 
         digitalWrite(LED_EXTERIOR_GREEN, LOW);
         digitalWrite(LED_EXTERIOR_RED, HIGH);
-
+        
         // will need to add the trigger for audio track 1 on Adafruit FX sound board here
+        triggerAudio(AUDIO_T00);
     }
     break;
     
@@ -62,6 +74,7 @@ void loop() {
         phaseStart = millis();
 
         // will need to set trigger for power relay module to turn UV light strip HIGH(ON)
+        digitalWrite(UV_RELAY, HIGH);
       }
       break;
 
@@ -74,7 +87,7 @@ void loop() {
         digitalWrite(LED_INTERIOR_RED, LOW);
 
         // also another trigger event for power relay module but to turn UV LOW(OFF)
-      
+        digitalWrite(UV_RELAY, LOW);
       }
       break;
     
