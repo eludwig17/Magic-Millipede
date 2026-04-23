@@ -1,11 +1,31 @@
 #include "WiFi.h"
 #include "esp_bt.h"
+#include "LittleFS.h"
 
 #define BTN 32
 #define UV_RELAY 26
 #define LED_EXTERIOR_RED 22
 #define LED_EXTERIOR_GREEN 23
 #define LED_INTERIOR_RED 21
+
+const char* countFile = "/counter.txt";
+
+uint32_t readCount(){
+  File f = LittleFS.open(countFile, "r");
+  if (!f)
+    return 0;
+  uint32_t val = f.parseInt();
+  f.close();
+  return val;
+}
+
+void writeCount(uint32_t val){
+  File f = LittleFS.open(countFile, "w");
+  if (f){
+    f.print(val);
+    f.close();
+  }
+}
 
 void triggerAudio(int pin){
   digitalWrite(pin, LOW);
@@ -17,6 +37,7 @@ void setup(){
   WiFi.mode(WIFI_OFF);
   btStop();
   esp_bt_controller_disable();
+  LittleFS.begin(true);
 
   pinMode(BTN, INPUT_PULLUP);
 
@@ -45,6 +66,8 @@ void loop(){
       if (digitalRead(BTN) == LOW){
         currState = PHASE_1;
         phaseStart = millis();
+
+        writeCount(readCount() +1);
 
         // LEDs | green turns off & red turns on
         digitalWrite(LED_EXTERIOR_GREEN, LOW); 
