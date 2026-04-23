@@ -1,0 +1,85 @@
+#include "WiFi.h"
+#include "esp_bt.h"
+
+#define BTN 32
+#define UV_RELAY 26
+#define LED_EXTERIOR_RED 22
+#define LED_EXTERIOR_GREEN 23
+#define LED_INTERIOR_RED 21
+
+void triggerAudio(int pin){
+  digitalWrite(pin, LOW);
+  delay(200);
+  digitalWrite(pin, HIGH);
+}
+
+void setup(){
+  WiFi.mode(WIFI_OFF);
+  btStop();
+  esp_bt_controller_disable();
+
+  pinMode(BTN, INPUT_PULLUP);
+
+  pinMode(UV_RELAY, OUTPUT);
+  digitalWrite(UV_RELAY, HIGH); 
+
+  pinMode(LED_EXTERIOR_RED, OUTPUT);
+  digitalWrite(LED_EXTERIOR_RED, LOW); 
+
+  pinMode(LED_EXTERIOR_GREEN, OUTPUT);
+  digitalWrite(LED_EXTERIOR_GREEN, HIGH);
+}
+
+#define IDLE 0
+#define PHASE_1 1
+#define PHASE_2 2
+#define PHASE_3 3
+
+int currState = IDLE;
+unsigned long phaseStart = 0;
+
+void loop(){
+  switch (currState){
+
+    case IDLE:
+      if (digitalRead(BTN) == LOW){
+        currState = PHASE_1;
+        phaseStart = millis();
+
+        // LEDs | green turns off & red turns on
+        digitalWrite(LED_EXTERIOR_GREEN, LOW); 
+        digitalWrite(LED_EXTERIOR_RED,   HIGH);
+    
+      }
+      
+      break;
+
+    case PHASE_1:
+      if (millis() - phaseStart >= 30000){
+        currState = PHASE_2;
+        phaseStart = millis();
+
+        digitalWrite(UV_RELAY, LOW); // uv lights turn on
+      }
+      break;
+
+    case PHASE_2:
+      if (millis() - phaseStart >= 60000){
+        currState = PHASE_3;
+        phaseStart = millis();
+
+        digitalWrite(UV_RELAY, HIGH);  // uv turns off for last 30 seconds
+      }
+      break;
+
+    case PHASE_3:
+      if (millis() - phaseStart >= 30000){
+        currState = IDLE;
+
+        // LEDs | green turns on & red turns off for idle state
+        digitalWrite(LED_EXTERIOR_RED,   LOW); 
+        digitalWrite(LED_EXTERIOR_GREEN, HIGH);
+      }
+      break;
+  }
+}
