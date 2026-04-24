@@ -86,6 +86,7 @@ void loop(){
         phaseStart = millis();
 
         digitalWrite(UV_RELAY, LOW); // uv lights turn on
+        digitalWrite(LED_INTERIOR_RED, HIGH); // red interior light turns off
       }
       break;
 
@@ -95,7 +96,6 @@ void loop(){
         phaseStart = millis();
 
         digitalWrite(UV_RELAY, HIGH);  // uv turns off for last 30 seconds
-        digitalWrite(LED_INTERIOR_RED, HIGH); // turns off red interior light for last 30 seconds
       }
       break;
 
