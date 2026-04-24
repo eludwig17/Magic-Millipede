@@ -49,6 +49,9 @@ void setup(){
 
   pinMode(LED_EXTERIOR_GREEN, OUTPUT);
   digitalWrite(LED_EXTERIOR_GREEN, HIGH);
+
+  pinMode(LED_INTERIOR_RED, OUTPUT);
+  digitalWrite(LED_INTERIOR_RED, LOW);
 }
 
 #define IDLE 0
@@ -92,6 +95,7 @@ void loop(){
         phaseStart = millis();
 
         digitalWrite(UV_RELAY, HIGH);  // uv turns off for last 30 seconds
+        digitalWrite(LED_INTERIOR_RED, HIGH); // turns off red interior light for last 30 seconds
       }
       break;
 
@@ -102,6 +106,8 @@ void loop(){
         // LEDs | green turns on & red turns off for idle state
         digitalWrite(LED_EXTERIOR_RED,   LOW); 
         digitalWrite(LED_EXTERIOR_GREEN, HIGH);
+
+        digitalWrite(LED_INTERIOR_RED, LOW); // red interior back on for idle state
       }
       break;
   }
