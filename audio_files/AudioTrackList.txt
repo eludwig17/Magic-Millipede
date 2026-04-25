@@ -1,8 +1,8 @@
 
 Audio Files Track List
 
-T00 - Intro educational narration
+T00 - Intro educational narration (ElevenLabs TTS conversion of Preliminary Millipede Narration)
 
-T01 - Continued educational narration
+T01 - Continued educational narration (ElevenLabs TTS conversion of Preliminary Millipede Narration)
 
 T02 - Classical music (clavier-music-cassical-piano-beethoven-215973.mp3 -> converted to .ogg & respective license file in this directory)
