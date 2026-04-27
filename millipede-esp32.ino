@@ -39,6 +39,9 @@ void setup(){
   esp_bt_controller_disable();
   LittleFS.begin(true);
 
+  Serial.begin(115200);
+  Serial.print("Presentation count: ");
+  Serial.println(readCount());
   pinMode(BTN, INPUT_PULLUP);
 
   pinMode(UV_RELAY, OUTPUT);
