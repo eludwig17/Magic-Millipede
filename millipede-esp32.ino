@@ -7,6 +7,10 @@
 #define LED_EXTERIOR_RED 22
 #define LED_EXTERIOR_GREEN 23
 #define LED_INTERIOR_RED 21
+#define AUDIO_T00 18
+#define AUDIO_T03 14
+#define AUDIO_T02 25
+#define AUDIO_RST 27
 
 const char* countFile = "/counter.txt";
 
@@ -28,9 +32,18 @@ void writeCount(uint32_t val){
 }
 
 void triggerAudio(int pin){
+  delay(100);
   digitalWrite(pin, LOW);
   delay(200);
   digitalWrite(pin, HIGH);
+  delay(100);
+}
+
+void resetAudio(){
+  digitalWrite(AUDIO_RST, LOW);
+  delay(100);
+  digitalWrite(AUDIO_RST, HIGH);
+  delay(500);
 }
 
 void setup(){
@@ -55,6 +68,16 @@ void setup(){
 
   pinMode(LED_INTERIOR_RED, OUTPUT);
   digitalWrite(LED_INTERIOR_RED, LOW);
+
+
+  pinMode(AUDIO_T00, OUTPUT);
+  digitalWrite(AUDIO_T00, HIGH);
+
+  pinMode(AUDIO_T03, OUTPUT);
+  digitalWrite(AUDIO_T03, HIGH);
+
+  pinMode(AUDIO_T02, OUTPUT);
+  digitalWrite(AUDIO_T02, HIGH);
 }
 
 #define IDLE 0
@@ -77,7 +100,10 @@ void loop(){
 
         // LEDs | green turns off & red turns on
         digitalWrite(LED_EXTERIOR_GREEN, LOW); 
-        digitalWrite(LED_EXTERIOR_RED,   HIGH);
+        digitalWrite(LED_EXTERIOR_RED, HIGH);
+        
+        // trigger audio 1
+        triggerAudio(AUDIO_T00);
     
       }
       
@@ -87,9 +113,13 @@ void loop(){
       if (millis() - phaseStart >= 30000){
         currState = PHASE_2;
         phaseStart = millis();
-
+        
+        resetAudio(); // resetting the audio before trigger audio 2
         digitalWrite(UV_RELAY, LOW); // uv lights turn on
         digitalWrite(LED_INTERIOR_RED, HIGH); // red interior light turns off
+      
+        // trigger audio #2, switched to T03 in testing, but final result should be set to T01)
+        triggerAudio(AUDIO_T03);
       }
       break;
 
@@ -98,7 +128,12 @@ void loop(){
         currState = PHASE_3;
         phaseStart = millis();
 
+        resetAudio(); //reset before triggering audio 3
+  
         digitalWrite(UV_RELAY, HIGH);  // uv turns off for last 30 seconds
+      
+        // trigger audio #3
+        triggerAudio(AUDIO_T02);
       }
       break;
 
@@ -111,6 +146,8 @@ void loop(){
         digitalWrite(LED_EXTERIOR_GREEN, HIGH);
 
         digitalWrite(LED_INTERIOR_RED, LOW); // red interior back on for idle state
+                                    
+        resetAudio(); // reset sound board one last time to idle state for preparing next narration cycle
       }
       break;
   }
