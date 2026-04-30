@@ -89,11 +89,15 @@ void setup(){
 int currState = IDLE;
 unsigned long phaseStart = 0;
 
+unsigned long lastBtnPress = 0;
+const unsigned long debounce_ms = 50;
+
 void loop(){
   switch (currState){
 
     case IDLE:
-      if (digitalRead(BTN) == LOW){
+      if (digitalRead(BTN) == LOW && millis() - lastBtnPress > debounce_ms){
+        lastBtnPress = millis();
         currState = PHASE_1;
         phaseStart = millis();
 
