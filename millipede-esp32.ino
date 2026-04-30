@@ -36,12 +36,11 @@ void triggerAudio(int pin){
   digitalWrite(pin, LOW);
   delay(200);
   digitalWrite(pin, HIGH);
-  delay(100);
 }
 
 void resetAudio(){
   digitalWrite(AUDIO_RST, LOW);
-  delay(100);
+  delay(10);
   digitalWrite(AUDIO_RST, HIGH);
   delay(500);
 }
@@ -58,17 +57,16 @@ void setup(){
   pinMode(BTN, INPUT_PULLUP);
 
   pinMode(UV_RELAY, OUTPUT);
-  digitalWrite(UV_RELAY, HIGH); 
+  digitalWrite(UV_RELAY, HIGH);
 
   pinMode(LED_EXTERIOR_RED, OUTPUT);
-  digitalWrite(LED_EXTERIOR_RED, LOW); 
+  digitalWrite(LED_EXTERIOR_RED, LOW);
 
   pinMode(LED_EXTERIOR_GREEN, OUTPUT);
   digitalWrite(LED_EXTERIOR_GREEN, HIGH);
 
   pinMode(LED_INTERIOR_RED, OUTPUT);
   digitalWrite(LED_INTERIOR_RED, LOW);
-
 
   pinMode(AUDIO_T00, OUTPUT);
   digitalWrite(AUDIO_T00, HIGH);
@@ -78,6 +76,9 @@ void setup(){
 
   pinMode(AUDIO_T02, OUTPUT);
   digitalWrite(AUDIO_T02, HIGH);
+
+  pinMode(AUDIO_RST, OUTPUT);
+  digitalWrite(AUDIO_RST, HIGH);
 }
 
 #define IDLE 0
@@ -99,25 +100,25 @@ void loop(){
         writeCount(readCount() +1);
 
         // LEDs | green turns off & red turns on
-        digitalWrite(LED_EXTERIOR_GREEN, LOW); 
+        digitalWrite(LED_EXTERIOR_GREEN, LOW);
         digitalWrite(LED_EXTERIOR_RED, HIGH);
-        
+
         // trigger audio 1
         triggerAudio(AUDIO_T00);
-    
+
       }
-      
+
       break;
 
     case PHASE_1:
       if (millis() - phaseStart >= 30000){
         currState = PHASE_2;
         phaseStart = millis();
-        
+
         resetAudio(); // resetting the audio before trigger audio 2
         digitalWrite(UV_RELAY, LOW); // uv lights turn on
         digitalWrite(LED_INTERIOR_RED, HIGH); // red interior light turns off
-      
+
         // trigger audio #2, switched to T03 in testing, but final result should be set to T01)
         triggerAudio(AUDIO_T03);
       }
@@ -129,9 +130,8 @@ void loop(){
         phaseStart = millis();
 
         resetAudio(); //reset before triggering audio 3
-  
+
         digitalWrite(UV_RELAY, HIGH);  // uv turns off for last 30 seconds
-      
         // trigger audio #3
         triggerAudio(AUDIO_T02);
       }
@@ -141,13 +141,15 @@ void loop(){
       if (millis() - phaseStart >= 30000){
         currState = IDLE;
 
+        resetAudio(); // reset sound board one last time to idle state for preparing next narration cycle
+
         // LEDs | green turns on & red turns off for idle state
-        digitalWrite(LED_EXTERIOR_RED,   LOW); 
+        digitalWrite(LED_EXTERIOR_RED,   LOW);
         digitalWrite(LED_EXTERIOR_GREEN, HIGH);
 
         digitalWrite(LED_INTERIOR_RED, LOW); // red interior back on for idle state
-                                    
-        resetAudio(); // reset sound board one last time to idle state for preparing next narration cycle
+
+
       }
       break;
   }
